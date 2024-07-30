@@ -5,6 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
   <style>
     #map { height: 600px; }
   </style>
@@ -13,27 +15,44 @@
   <h1>Drum Level and Location Monitoring</h1>
   <div id="map"></div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script>
-    const map = L.map('map').setView([51.505, -0.09], 13); // Initial view set to London
+    // Initialize the map and set its view to New Zealand
+    const map = L.map('map').setView([-40.9006, 174.886], 5); // New Zealand's coordinates
 
+    // Load and display tile layer on the map
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
     }).addTo(map);
 
-    const marker = L.marker([51.505, -0.09]).addTo(map).bindPopup("Dummy Data: Drum at 20% capacity. Product: Acid").openPopup();
+    // Create a marker cluster group
+    const markers = L.markerClusterGroup();
 
-    function updateDummyData() {
-      const dummyData = {
-        lat: 51.505,
-        lon: -0.09,
-        alert: "Dummy Data: Drum at 20% capacity",
-        product: "Acid"
-      };
-      marker.setLatLng([dummyData.lat, dummyData.lon]).bindPopup(`${dummyData.alert}. Product: ${dummyData.product}`).openPopup();
-      map.setView([dummyData.lat, dummyData.lon], 13);
+    // Dummy data for demonstration
+    const drums = [
+      { lat: -36.8485, lon: 174.7633, name: "Drum 1", product: "Acid", alert: false }, // Auckland
+      { lat: -36.8485, lon: 174.7633, name: "Drum 2", product: "Alkali", alert: true },
+      { lat: -41.2865, lon: 174.7762, name: "Drum 3", product: "Hypo", alert: false }, // Wellington
+      { lat: -43.5321, lon: 172.6362, name: "Drum 4", product: "Teat Spray Concentrate", alert: true }, // Christchurch
+      { lat: -45.8788, lon: 170.5028, name: "Drum 5", product: "Acid", alert: false }, // Dunedin
+    ];
+
+    // Function to get marker color based on alert status
+    function getMarkerColor(alert) {
+      return alert ? 'red' : 'green';
     }
 
-    setInterval(updateDummyData, 60000); // Update every minute
+    // Add markers to the cluster group
+    drums.forEach(drum => {
+      const marker = L.circleMarker([drum.lat, drum.lon], {
+        color: getMarkerColor(drum.alert),
+        radius: 8,
+      }).bindPopup(`<b>${drum.name}</b><br>Product: ${drum.product}<br>Status: ${drum.alert ? '20% capacity reached' : 'Normal'}`);
+      markers.addLayer(marker);
+    });
+
+    // Add the marker cluster group to the map
+    map.addLayer(markers);
   </script>
 </body>
 </html>
