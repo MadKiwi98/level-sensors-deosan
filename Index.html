@@ -8,11 +8,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
   <style>
-    #map { height: 600px; }
+    #map { height: 100vh; width: 100%; }
+    .red-marker { background-color: red; }
+    .green-marker { background-color: green; }
   </style>
 </head>
 <body>
-  <h1>Drum Level and Location Monitoring</h1>
   <div id="map"></div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
@@ -37,16 +38,30 @@
       { lat: -45.8788, lon: 170.5028, name: "Drum 5", product: "Acid", alert: false }, // Dunedin
     ];
 
-    // Function to get marker color based on alert status
-    function getMarkerColor(alert) {
-      return alert ? 'red' : 'green';
+    // Function to create a custom marker with color based on alert status
+    function createCustomMarker(alert) {
+      const markerHtmlStyles = `
+        background-color: ${alert ? 'red' : 'green'};
+        width: 2rem;
+        height: 2rem;
+        display: block;
+        left: -1rem;
+        top: -1rem;
+        position: relative;
+        border-radius: 3rem 3rem 0;
+        transform: rotate(45deg);
+        border: 1px solid #FFFFFF`;
+
+      return L.divIcon({
+        className: "custom-marker",
+        html: `<span style="${markerHtmlStyles}" />`
+      });
     }
 
     // Add markers to the cluster group
     drums.forEach(drum => {
-      const marker = L.circleMarker([drum.lat, drum.lon], {
-        color: getMarkerColor(drum.alert),
-        radius: 8,
+      const marker = L.marker([drum.lat, drum.lon], {
+        icon: createCustomMarker(drum.alert)
       }).bindPopup(`<b>${drum.name}</b><br>Product: ${drum.product}<br>Status: ${drum.alert ? '20% capacity reached' : 'Normal'}`);
       markers.addLayer(marker);
     });
