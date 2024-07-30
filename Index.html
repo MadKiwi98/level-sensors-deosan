@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>Drum Level and Location Monitoring</title>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
   <style>
     #map { height: 100vh; width: 100%; }
     .red-marker { background-color: red; }
@@ -18,56 +18,60 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script>
-    // Initialize the map and set its view to New Zealand
-    const map = L.map('map').setView([-40.9006, 174.886], 5); // New Zealand's coordinates
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("DOM fully loaded and parsed");
+      
+      // Initialize the map and set its view to New Zealand
+      const map = L.map('map').setView([-40.9006, 174.886], 5); // New Zealand's coordinates
 
-    // Load and display tile layer on the map
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-    }).addTo(map);
+      // Load and display tile layer on the map
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+      }).addTo(map);
 
-    // Create a marker cluster group
-    const markers = L.markerClusterGroup();
+      // Create a marker cluster group
+      const markers = L.markerClusterGroup();
 
-    // Dummy data for demonstration
-    const drums = [
-      { lat: -36.8485, lon: 174.7633, name: "Drum 1", product: "Acid", alert: false }, // Auckland
-      { lat: -36.8485, lon: 174.7633, name: "Drum 2", product: "Alkali", alert: true },
-      { lat: -41.2865, lon: 174.7762, name: "Drum 3", product: "Hypo", alert: false }, // Wellington
-      { lat: -43.5321, lon: 172.6362, name: "Drum 4", product: "Teat Spray Concentrate", alert: true }, // Christchurch
-      { lat: -45.8788, lon: 170.5028, name: "Drum 5", product: "Acid", alert: false }, // Dunedin
-    ];
+      // Dummy data for demonstration
+      const drums = [
+        { lat: -36.8485, lon: 174.7633, name: "Drum 1", product: "Acid", alert: false }, // Auckland
+        { lat: -36.8485, lon: 174.7633, name: "Drum 2", product: "Alkali", alert: true },
+        { lat: -41.2865, lon: 174.7762, name: "Drum 3", product: "Hypo", alert: false }, // Wellington
+        { lat: -43.5321, lon: 172.6362, name: "Drum 4", product: "Teat Spray Concentrate", alert: true }, // Christchurch
+        { lat: -45.8788, lon: 170.5028, name: "Drum 5", product: "Acid", alert: false }, // Dunedin
+      ];
 
-    // Function to create a custom marker with color based on alert status
-    function createCustomMarker(alert) {
-      const markerHtmlStyles = `
-        background-color: ${alert ? 'red' : 'green'};
-        width: 2rem;
-        height: 2rem;
-        display: block;
-        left: -1rem;
-        top: -1rem;
-        position: relative;
-        border-radius: 3rem 3rem 0;
-        transform: rotate(45deg);
-        border: 1px solid #FFFFFF`;
+      // Function to create a custom marker with color based on alert status
+      function createCustomMarker(alert) {
+        const markerHtmlStyles = `
+          background-color: ${alert ? 'red' : 'green'};
+          width: 2rem;
+          height: 2rem;
+          display: block;
+          left: -1rem;
+          top: -1rem;
+          position: relative;
+          border-radius: 3rem 3rem 0;
+          transform: rotate(45deg);
+          border: 1px solid #FFFFFF`;
 
-      return L.divIcon({
-        className: "custom-marker",
-        html: `<span style="${markerHtmlStyles}" />`
+        return L.divIcon({
+          className: "custom-marker",
+          html: `<span style="${markerHtmlStyles}" />`
+        });
+      }
+
+      // Add markers to the cluster group
+      drums.forEach(drum => {
+        const marker = L.marker([drum.lat, drum.lon], {
+          icon: createCustomMarker(drum.alert)
+        }).bindPopup(`<b>${drum.name}</b><br>Product: ${drum.product}<br>Status: ${drum.alert ? '20% capacity reached' : 'Normal'}`);
+        markers.addLayer(marker);
       });
-    }
 
-    // Add markers to the cluster group
-    drums.forEach(drum => {
-      const marker = L.marker([drum.lat, drum.lon], {
-        icon: createCustomMarker(drum.alert)
-      }).bindPopup(`<b>${drum.name}</b><br>Product: ${drum.product}<br>Status: ${drum.alert ? '20% capacity reached' : 'Normal'}`);
-      markers.addLayer(marker);
+      // Add the marker cluster group to the map
+      map.addLayer(markers);
     });
-
-    // Add the marker cluster group to the map
-    map.addLayer(markers);
   </script>
 </body>
 </html>
